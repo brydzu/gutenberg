@@ -33,15 +33,14 @@ import {
 	toHTMLString,
 	getTextContent,
 	insert,
-	insertLineBreak,
-	insertLineSeparator,
-	isEmptyLine,
-	unstableToDom,
+	__unstableInsertLineSeparator as insertLineSeparator,
+	__unstableIsEmptyLine as isEmptyLine,
+	__unstableToDom as toDom,
 	remove,
 	removeFormat,
 	isCollapsed,
-	LINE_SEPARATOR,
-	indentListItems,
+	__UNSTABLE_LINE_SEPARATOR as LINE_SEPARATOR,
+	__unstableIndentListItems as indentListItems,
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withFilters, IsolatedEventContainer } from '@wordpress/components';
@@ -737,14 +736,14 @@ export class RichText extends Component {
 
 			if ( this.multilineTag ) {
 				if ( event.shiftKey ) {
-					this.onChange( insertLineBreak( record ) );
+					this.onChange( insert( record, '\n' ) );
 				} else if ( this.onSplit && isEmptyLine( record ) ) {
 					this.onSplit( ...split( record ).map( this.valueToFormat ) );
 				} else {
 					this.onChange( insertLineSeparator( record ) );
 				}
 			} else if ( event.shiftKey || ! this.onSplit ) {
-				this.onChange( insertLineBreak( record ) );
+				this.onChange( insert( record, '\n' ) );
 			} else {
 				this.splitContent();
 			}
@@ -1017,7 +1016,7 @@ export class RichText extends Component {
 	}
 
 	valueToEditableHTML( value ) {
-		return unstableToDom( {
+		return toDom( {
 			value,
 			multilineTag: this.multilineTag,
 			prepareEditableTree: this.props.prepareEditableTree,
@@ -1055,7 +1054,7 @@ export class RichText extends Component {
 
 		// Handle deprecated `children` and `node` sources.
 		if ( this.usedDeprecatedChildrenSource ) {
-			return children.fromDOM( unstableToDom( {
+			return children.fromDOM( toDom( {
 				value,
 				multilineTag: this.multilineTag,
 				isEditableTree: false,
